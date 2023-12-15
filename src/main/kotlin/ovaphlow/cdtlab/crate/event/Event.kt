@@ -1,7 +1,6 @@
 package ovaphlow.cdtlab.crate.event
 
 import java.util.*
-import kotlin.reflect.full.memberProperties
 
 open class Event(
     var id: Long,

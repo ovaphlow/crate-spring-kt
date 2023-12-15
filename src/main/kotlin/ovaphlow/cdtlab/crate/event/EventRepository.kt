@@ -3,7 +3,6 @@ package ovaphlow.cdtlab.crate.event
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
 import ovaphlow.cdtlab.crate.utility.ConditionBuilder
 import java.sql.ResultSet
@@ -60,7 +59,7 @@ class EventRepository(private val jdbcTemplate: JdbcTemplate) {
         }
         q += " order by id desc limit $skip, $take"
         logger.info(q)
-        val result = jdbcTemplate.query(q, RowMapper { rs: ResultSet, _: Int ->
+        val result = jdbcTemplate.query(q, { rs: ResultSet, _: Int ->
             Event(
                 id = rs.getLong("id"),
                 relationId = rs.getLong("relation_id"),
