@@ -7,12 +7,17 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import ovaphlow.cdtlab.crate.utility.SharedRepository
 
 @RestController
 @RequestMapping(path = ["/crate-api/events"])
 class EventController {
+
     @Autowired
     lateinit var eventRepository: EventRepository
+
+    @Autowired
+    lateinit var sharedRepository: SharedRepository
 
     @RequestMapping(path = [""], method = [RequestMethod.GET])
     fun filter(
@@ -30,34 +35,36 @@ class EventController {
             val inList = request.getParameter("in")?.split(",") ?: listOf()
             val lesser = request.getParameter("lesser")?.split(",") ?: listOf()
             val greater = request.getParameter("greater")?.split(",") ?: listOf()
-            val result = eventRepository.defaultFilter(
+            val result = sharedRepository.retrieve(
+                "event",
                 skip,
                 take,
-                equal,
-                objectContain,
-                arrayContain,
-                like,
-                objectLike,
-                inList,
-                lesser,
-                greater
+                mapOf(
+                    "equal" to equal,
+                    "objectContain" to objectContain,
+                    "arrayContain" to arrayContain,
+                    "like" to like,
+                    "objectLike" to objectLike,
+                    "in" to inList,
+                    "lesser" to lesser,
+                    "greater" to greater,
+                ),
             )
-            val response: MutableList<Map<String, Any>> = mutableListOf()
-            for (i in result.indices) {
-                response += mapOf(
-                    "id" to result[i].id,
-                    "relationId" to result[i].relationId,
-                    "referenceId" to result[i].referenceId,
-                    "tags" to result[i].tags,
-                    "detail" to result[i].detail,
-                    "time" to result[i].time,
-                    "_id" to result[i].id.toString(),
-                    "_relationId" to result[i].relationId.toString(),
-                    "_referenceId" to result[i].referenceId.toString(),
+            val response: List<MutableMap<String, Any?>> = result.map {
+                mutableMapOf(
+                    "id" to it["id"],
+                    "relationId" to it["relation_id"],
+                    "referenceId" to it["reference_id"],
+                    "tags" to it["tags"],
+                    "detail" to it["detail"],
+                    "time" to it["time"],
+                    "_id" to it["id"],
+                    "_relationId" to it["relation_id"],
+                    "_referenceId" to it["reference_id"],
                 )
             }
             return ResponseEntity.ok().body(response)
         }
-        return ResponseEntity.status(406).body(mapOf("error" to "invalid option"))
+        return ResponseEntity.status(406).body(mapOf("message" to "invalid option"))
     }
 }
