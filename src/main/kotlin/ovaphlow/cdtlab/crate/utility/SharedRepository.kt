@@ -70,6 +70,7 @@ class SharedRepository(private val jdbcTemplate: JdbcTemplate) {
             q += conditions.joinToString(" and ", " where ")
         }
         q += " order by id desc limit $skip, $take"
+        logger.debug(q)
         val result = jdbcTemplate.queryForList(q, *params.toTypedArray())
         return result
     }

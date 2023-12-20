@@ -14,9 +14,6 @@ import ovaphlow.cdtlab.crate.utility.SharedRepository
 class EventController {
 
     @Autowired
-    lateinit var eventRepository: EventRepository
-
-    @Autowired
     lateinit var sharedRepository: SharedRepository
 
     @RequestMapping(path = [""], method = [RequestMethod.GET])
