@@ -3,18 +3,21 @@ package ovaphlow.cdtlab.crate.event
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import ovaphlow.cdtlab.crate.utility.SharedRepository
+import ovaphlow.cdtlab.crate.utility.ConditionBuilder
+import ovaphlow.cdtlab.crate.utility.Constants
 
 @RestController
-@RequestMapping(path = ["/crate-api/events"])
+@RequestMapping(path = ["/crate-api/event"])
+@CrossOrigin
 class EventController {
 
     @Autowired
-    lateinit var sharedRepository: SharedRepository
+    lateinit var eventRepository: EventRepository
 
     @RequestMapping(path = [""], method = [RequestMethod.GET])
     fun filter(
@@ -24,43 +27,32 @@ class EventController {
         request: HttpServletRequest
     ): ResponseEntity<Any> {
         if (option == "default") {
-            val equal = request.getParameter("equal")?.split(",") ?: listOf()
-            val objectContain = request.getParameter("object-contain")?.split(",") ?: listOf()
-            val arrayContain = request.getParameter("array-contain")?.split(",") ?: listOf()
-            val like = request.getParameter("like")?.split(",") ?: listOf()
-            val objectLike = request.getParameter("object-like")?.split(",") ?: listOf()
-            val inList = request.getParameter("in")?.split(",") ?: listOf()
-            val lesser = request.getParameter("lesser")?.split(",") ?: listOf()
-            val greater = request.getParameter("greater")?.split(",") ?: listOf()
-            val result = sharedRepository.retrieve(
-                "event",
-                skip,
-                take,
-                mapOf(
-                    "equal" to equal,
-                    "objectContain" to objectContain,
-                    "arrayContain" to arrayContain,
-                    "like" to like,
-                    "objectLike" to objectLike,
-                    "in" to inList,
-                    "lesser" to lesser,
-                    "greater" to greater,
-                ),
+            val options = ConditionBuilder.Option(skip, take)
+            val filters = ConditionBuilder.Filter(
+                request.getParameter("equal")?.split(",") ?: listOf(),
+                request.getParameter("object-contain")?.split(",") ?: listOf(),
+                request.getParameter("array-contain")?.split(",") ?: listOf(),
+                request.getParameter("like")?.split(",") ?: listOf(),
+                request.getParameter("object-like")?.split(",") ?: listOf(),
+                request.getParameter("in")?.split(",") ?: listOf(),
+                request.getParameter("lesser")?.split(",") ?: listOf(),
+                request.getParameter("greater")?.split(",") ?: listOf(),
             )
+            val result = eventRepository.defaultFilter(options, filters)
             val response: List<MutableMap<String, Any?>> = result.map {
                 mutableMapOf(
-                    "id" to it["id"],
-                    "relationId" to it["relation_id"],
-                    "referenceId" to it["reference_id"],
-                    "tags" to it["tags"],
-                    "detail" to it["detail"],
-                    "time" to it["time"],
-                    "_id" to it["id"],
-                    "_relationId" to it["relation_id"],
-                    "_referenceId" to it["reference_id"],
+                    "id" to it.id,
+                    "relationId" to it.relationId,
+                    "referenceId" to it.referenceId,
+                    "tags" to it.tags,
+                    "detail" to it.detail,
+                    "time" to it.time,
+                    "_id" to it.id.toString(),
+                    "_relationId" to it.relationId.toString(),
+                    "_referenceId" to it.referenceId.toString(),
                 )
             }
-            return ResponseEntity.ok().body(response)
+            return ResponseEntity.ok().header(Constants.HEADER_API_VERSION, "2024-01-06").body(response)
         }
         return ResponseEntity.status(406).body(mapOf("message" to "invalid option"))
     }
