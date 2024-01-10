@@ -67,12 +67,12 @@ class EventRepository(private val jdbcTemplate: JdbcTemplate) {
         logger.info(q)
         val result = jdbcTemplate.query(q, { rs: ResultSet, _: Int ->
             Event(
-                id = rs.getLong("id"),
-                relationId = rs.getLong("relation_id"),
-                referenceId = rs.getLong("reference_id"),
-                tags = rs.getString("tags"),
-                detail = rs.getString("detail"),
-                time = rs.getDate("time")
+                rs.getLong("id"),
+                rs.getLong("relation_id"),
+                rs.getLong("reference_id"),
+                rs.getString("tags"),
+                rs.getString("detail"),
+                rs.getDate("time")
             )
         }, *params.toTypedArray())
         return result
