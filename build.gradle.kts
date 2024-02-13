@@ -28,6 +28,7 @@ dependencies {
 	runtimeOnly("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	implementation("io.jsonwebtoken:jjwt:0.9.1")
+	implementation("cn.hutool:hutool-core:5.8.26")
 }
 
 tasks.withType<KotlinCompile> {
