@@ -9,8 +9,6 @@ import java.sql.ResultSet
 @Repository
 class SchemaRepository(private val jdbcTemplate: JdbcTemplate) {
 
-    val logger: Logger = LoggerFactory.getLogger(SchemaRepository::class.java)
-
     fun retrieve(): List<String> {
         val q = "select schema_name from information_schema.schemata"
         val result = jdbcTemplate.query(q) { rs: ResultSet, _: Int ->
