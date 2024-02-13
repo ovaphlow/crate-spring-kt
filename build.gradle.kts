@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "ovaphlow.cdtlab"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.1"
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_17
@@ -25,6 +25,7 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.mysql:mysql-connector-j")
+	runtimeOnly("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	implementation("io.jsonwebtoken:jjwt:0.9.1")
 }
