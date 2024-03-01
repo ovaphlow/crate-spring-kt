@@ -22,7 +22,7 @@ class ConditionBuilder {
 
     fun equal(equal: List<String>): Pair<List<String>, List<String>> {
         if (equal.isEmpty() || equal.size % 2 != 0) {
-            logger.debug("equal is empty or not even")
+            logger.debug("equal 参数错误")
             return Pair(listOf(), listOf())
         }
         val conditions = mutableListOf<String>()
@@ -34,9 +34,91 @@ class ConditionBuilder {
         return Pair(conditions, params)
     }
 
+    fun notEqual(notEqual: List<String>): Pair<List<String>, List<String>> {
+        if (notEqual.isEmpty() || notEqual.size % 2 != 0) {
+            logger.debug("notEqual 参数错误")
+            return Pair(listOf(), listOf())
+        }
+        val conditions = mutableListOf<String>()
+        val params = mutableListOf<String>()
+        for (i in notEqual.indices step 2) {
+            conditions += "${notEqual[i]} != ?"
+            params += notEqual[i + 1]
+        }
+        return Pair(conditions, params)
+    }
+
+    fun like(like: List<String>): Pair<List<String>, List<String>> {
+        if (like.isEmpty() || like.size % 2 != 0) {
+            logger.debug("like 参数错误")
+            return Pair(listOf(), listOf())
+        }
+        val conditions = mutableListOf<String>()
+        val params = mutableListOf<String>()
+        for (i in like.indices step 2) {
+            conditions += "position(? in ${like[i]})"
+            params += like[i + 1]
+        }
+        return Pair(conditions, params)
+    }
+
+    fun greater(greater: List<String>): Pair<List<String>, List<String>> {
+        if (greater.isEmpty() || greater.size % 2 != 0) {
+            logger.debug("greater 参数错误")
+            return Pair(listOf(), listOf())
+        }
+        val conditions = mutableListOf<String>()
+        val params = mutableListOf<String>()
+        for (i in greater.indices step 2) {
+            conditions += "${greater[i]} >= ?"
+            params += greater[i + 1]
+        }
+        return Pair(conditions, params)
+    }
+
+    fun lesser(lesser: List<String>): Pair<List<String>, List<String>> {
+        if (lesser.isEmpty() || lesser.size % 2 != 0) {
+            logger.debug("lesser 参数错误")
+            return Pair(listOf(), listOf())
+        }
+        val conditions = mutableListOf<String>()
+        val params = mutableListOf<String>()
+        for (i in lesser.indices step 2) {
+            conditions += "${lesser[i]} <= ?"
+            params += lesser[i + 1]
+        }
+        return Pair(conditions, params)
+    }
+
+    fun inList(inList: List<String>): Pair<List<String>, List<String>> {
+        if (inList.isEmpty() || inList.size < 2) {
+            logger.debug("inList 参数错误")
+            return Pair(listOf(), listOf())
+        }
+        val c: List<String> = List(inList.size - 1) { "?" }
+        val conditions = mutableListOf<String>()
+        val params = mutableListOf<String>()
+        conditions += "${inList[0]} in (${c.joinToString(", ")})"
+        params += inList.subList(1, inList.size)
+        return Pair(conditions, params)
+    }
+
+    fun notInList(notInList: List<String>): Pair<List<String>, List<String>> {
+        if (notInList.isEmpty() || notInList.size < 2) {
+            logger.debug("notInList 参数错误")
+            return Pair(listOf(), listOf())
+        }
+        val c: List<String> = List(notInList.size - 1) { "?" }
+        val conditions = mutableListOf<String>()
+        val params = mutableListOf<String>()
+        conditions += "${notInList[0]} not in (${c.joinToString(", ")})"
+        params += notInList.subList(1, notInList.size)
+        return Pair(conditions, params)
+    }
+
     fun objectContain(objectContain: List<String>): Pair<List<String>, List<String>> {
         if (objectContain.isEmpty() || objectContain.size % 3 != 0) {
-            logger.debug("objectContain is empty or not even")
+            logger.debug("objectContain 参数错误")
             return Pair(listOf(), listOf())
         }
         val conditions = mutableListOf<String>()
@@ -50,7 +132,7 @@ class ConditionBuilder {
 
     fun arrayContain(arrayContain: List<String>): Pair<List<String>, List<String>> {
         if (arrayContain.isEmpty() || arrayContain.size % 2 != 0) {
-            logger.debug("arrayContain is empty or not even")
+            logger.debug("arrayContain 参数错误")
             return Pair(listOf(), listOf())
         }
         val conditions = mutableListOf<String>()
@@ -62,23 +144,9 @@ class ConditionBuilder {
         return Pair(conditions, params)
     }
 
-    fun like(like: List<String>): Pair<List<String>, List<String>> {
-        if (like.isEmpty() || like.size % 2 != 0) {
-            logger.debug("like is empty or not even")
-            return Pair(listOf(), listOf())
-        }
-        val conditions = mutableListOf<String>()
-        val params = mutableListOf<String>()
-        for (i in like.indices step 2) {
-            conditions += "position(? in ${like[i]})"
-            params += like[i + 1]
-        }
-        return Pair(conditions, params)
-    }
-
     fun objectLike(objectLike: List<String>): Pair<List<String>, List<String>> {
         if (objectLike.isEmpty() || objectLike.size % 3 != 0) {
-            logger.debug("objectLike is empty or not even")
+            logger.debug("objectLike 参数错误")
             return Pair(listOf(), listOf())
         }
         val conditions = mutableListOf<String>()
@@ -86,47 +154,6 @@ class ConditionBuilder {
         for (i in objectLike.indices step 3) {
             conditions += "position(? in ${objectLike[i]}->>'$.${objectLike[i + 1]}')"
             params += objectLike[i + 2]
-        }
-        return Pair(conditions, params)
-    }
-
-    fun inList(inList: List<String>): Pair<List<String>, List<String>> {
-        if (inList.isEmpty() || inList.size < 2) {
-            logger.debug("inList is empty or not even")
-            return Pair(listOf(), listOf())
-        }
-        val c: List<String> = List(inList.size - 1) { "?" }
-        val conditions = mutableListOf<String>()
-        val params = mutableListOf<String>()
-        conditions += "${inList[0]} in (${c.joinToString(", ")})"
-        params += inList.subList(1, inList.size)
-        return Pair(conditions, params)
-    }
-
-    fun lesser(lesser: List<String>): Pair<List<String>, List<String>> {
-        if (lesser.isEmpty() || lesser.size % 2 != 0) {
-            logger.debug("lesser is empty or not even")
-            return Pair(listOf(), listOf())
-        }
-        val conditions = mutableListOf<String>()
-        val params = mutableListOf<String>()
-        for (i in lesser.indices step 2) {
-            conditions += "${lesser[i]} <= ?"
-            params += lesser[i + 1]
-        }
-        return Pair(conditions, params)
-    }
-
-    fun greater(greater: List<String>): Pair<List<String>, List<String>> {
-        if (greater.isEmpty() || greater.size % 2 != 0) {
-            logger.debug("greater is empty or not even")
-            return Pair(listOf(), listOf())
-        }
-        val conditions = mutableListOf<String>()
-        val params = mutableListOf<String>()
-        for (i in greater.indices step 2) {
-            conditions += "${greater[i]} >= ?"
-            params += greater[i + 1]
         }
         return Pair(conditions, params)
     }
