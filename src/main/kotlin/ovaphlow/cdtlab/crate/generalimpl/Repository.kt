@@ -1,6 +1,5 @@
 package ovaphlow.cdtlab.crate.generalimpl
 
-import cn.hutool.core.lang.Snowflake
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
@@ -8,7 +7,6 @@ import ovaphlow.cdtlab.crate.utilities.IdGenerator
 import ovaphlow.cdtlab.crate.utility.ConditionBuilder
 import java.sql.ResultSet
 import java.util.*
-import java.util.concurrent.locks.Condition
 
 @Repository
 class Repository(private val jdbcTemplate: JdbcTemplate) {
